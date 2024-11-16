@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Recognizor</title>
+    <link rel="shortcut icon" href="favicon.svg" type="image/x-icon">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="text-gray-400 bg-gray-900">  
+    <section class="body-font">
+        <div class="container px-5 py-24 mx-auto">
+          <div class="flex flex-col text-center w-full mb-12">
+            <h1 class="sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-100">AI Object Recognizor</h1>
+            <p class="lg:w-2/3 mx-auto leading-relaxed text-base">AI Object Recognizer is an advanced technology that utilizes artificial intelligence to identify and categorize objects within digital images or video streams. This cutting-edge system employs deep learning algorithms to analyze and interpret visual data, allowing it to recognize various objects with high accuracy. The AI Object Recognizer has a wide range of applications, including security surveillance, autonomous vehicles, and image-based search engines. Its ability to swiftly and accurately identify objects in real-time contributes to enhanced efficiency and automation in various industries. As technology continues to advance, AI Object Recognizers play a crucial role in revolutionizing how we interact with and utilize visual information, paving the way for more intelligent and automated systems.</p>
+          </div>
+<button  class="flex mx-auto text-black bg-green-400 border-0 py-2 px-8 focus:outline-none hover:bg-green-700 hover:text-white font-medium rounded text-lg" type="button" onclick="init()">Start Recognizing</button>
+<div class="container mx-auto flex flex-col px-5 py-10 justify-center items-center" id="webcam-container"></div>
+<div class="container mx-auto flex flex-col px-5 justify-center items-center text-2xl text-white" id="label-container"></div>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+<script type="text/javascript">
+    // More API functions here:
+    // https://github.com/googlecreativelab/teachablemachine-community/tree/master/libraries/image
+
+    // the link to your model provided by Teachable Machine export panel
+    const URL = "https://teachablemachine.withgoogle.com/models/qR4kiPbJg/";
+
+    let model, webcam, labelContainer, maxPredictions;
+
+    // Load the image model and setup the webcam
+    async function init() {
+        const modelURL = URL + "model.json";
+        const metadataURL = URL + "metadata.json";
+
+        // load the model and metadata
+        // Refer to tmImage.loadFromFiles() in the API to support files from a file picker
+        // or files from your local hard drive
+        // Note: the pose library adds "tmImage" object to your window (window.tmImage)
+        model = await tmImage.load(modelURL, metadataURL);
+        maxPredictions = model.getTotalClasses();
+
+        // Convenience function to setup a webcam
+        const flip = true; // whether to flip the webcam
+        webcam = new tmImage.Webcam(300, 300, flip); // width, height, flip
+        await webcam.setup(); // request access to the webcam
+        await webcam.play();
+        window.requestAnimationFrame(loop);
+
+        // append elements to the DOM
+        document.getElementById("webcam-container").appendChild(webcam.canvas);
+        labelContainer = document.getElementById("label-container");
+        for (let i = 0; i < maxPredictions; i++) { // and class labels
+            labelContainer.appendChild(document.createElement("div"));
+        }
+    }
+
+    async function loop() {
+        webcam.update(); // update the webcam frame
+        await predict();
+        window.requestAnimationFrame(loop);
+    }
+
+    // run the webcam image through the image model
+    async function predict() {
+        // predict can take in an image, video or canvas html element
+        const prediction = await model.predict(webcam.canvas);
+        for (let i = 0; i < maxPredictions; i++) {
+            const classPrediction =
+                prediction[i].className + ": " + prediction[i].probability.toFixed(2);
+            labelContainer.childNodes[i].innerHTML = classPrediction;
+        }
+    }
+</script>
+    </section>
+</body>
+</html>

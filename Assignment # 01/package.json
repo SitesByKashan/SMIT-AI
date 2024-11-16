@@ -1,0 +1,19 @@
+{
+  "name": "sites-by-kashan",
+  "version": "1.0.0",
+  "description": "A website project for Sites By Kashan",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/your-repo.git"
+  },
+  "author": "Kashan Malik",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1",
+    "nodemon": "^3.1.0"
+  }
+}
